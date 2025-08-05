@@ -172,7 +172,7 @@ ${redacao}`;
     }
   }
 
- baixarPDF() {
+  baixarPDF() {
     const resultado = document.getElementById("resultado").innerText.trim();
     const turmaInput = document.getElementById("turma");
     const alunoInput = document.getElementById("aluno");
@@ -212,6 +212,11 @@ ${redacao}`;
     doc.save(`${nomeArquivo}.pdf`);
   }
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+  window.corretor = new CorretorRedacao();
+});
+
 
 document.addEventListener('DOMContentLoaded', () => {
   window.corretor = new CorretorRedacao();
