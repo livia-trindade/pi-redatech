@@ -172,45 +172,59 @@ ${redacao}`;
     }
   }
 
-  baixarPDF() {
-    const resultado = document.getElementById("resultado").innerText.trim();
-    const turmaInput = document.getElementById("turma");
-    const alunoInput = document.getElementById("aluno");
-    const turma = turmaInput ? turmaInput.value.trim() : null;
-    const aluno = alunoInput ? alunoInput.value.trim() : null;
-    const tema = document.getElementById("tema").value.trim();
+baixarPDF() {
+  const resultado = document.getElementById("resultado").innerText.trim();
+  const turmaInput = document.getElementById("turma");
+  const alunoInput = document.getElementById("aluno");
+  const turma = turmaInput ? turmaInput.value.trim() : null;
+  const aluno = alunoInput ? alunoInput.value.trim() : null;
+  const tema = document.getElementById("tema").value.trim();
 
-    if (!resultado || resultado.includes("aguarde") || resultado.includes("Aguardando")) {
-      alert("Nenhum resultado disponível para exportar.");
-      return;
-    }
-
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-    const hoje = new Date().toLocaleDateString("pt-BR");
-
-    doc.setFontSize(14);
-    doc.text("Avaliação da Redação - ENEM", 10, 10);
-    doc.setFontSize(10);
-
-    let infoLine = `Data: ${hoje} | Tema: ${tema}`;
-    if (turma && aluno) {
-      infoLine = `Aluno: ${aluno} | Turma: ${turma} | ${infoLine}`;
-    }
-    doc.text(infoLine, 10, 18);
-
-    doc.setFontSize(12);
-    const linhas = doc.splitTextToSize(resultado, 180);
-    doc.text(linhas, 10, 30);
-
-    let nomeArquivo;
-    if (turma && aluno) {
-      nomeArquivo = `Correcao_${aluno}_${turma}`.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 50);
-    } else {
-      nomeArquivo = `Correcao_${tema}`.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 50);
-    }
-    doc.save(`${nomeArquivo}.pdf`);
+  if (!resultado || resultado.includes("aguarde") || resultado.includes("Aguardando")) {
+    alert("Nenhum resultado disponível para exportar.");
+    return;
   }
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: "mm", format: "a4" }); 
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const margin = 15;
+  const maxWidth = pageWidth - 2 * margin;
+  const hoje = new Date().toLocaleDateString("pt-BR");
+
+  doc.setFont("Times", ""); 
+  doc.setFontSize(14);
+  doc.text("Avaliação da Redação - ENEM", margin, 20);
+
+  doc.setFontSize(10);
+  let infoLine = `Data: ${hoje} | Tema: ${tema}`;
+  if (turma && aluno) {
+    infoLine = `Aluno: ${aluno} | Turma: ${turma} | ${infoLine}`;
+  }
+  doc.text(infoLine, margin, 28);
+
+  doc.setFontSize(12);
+
+  const linhas = doc.splitTextToSize(resultado, maxWidth);
+  let y = 40;
+
+  for (let i = 0; i < linhas.length; i++) {
+    if (y > 280) {
+      doc.addPage();
+      y = 20;
+    }
+    doc.text(linhas[i], margin, y);
+    y += 7; 
+  }
+
+  let nomeArquivo;
+  if (turma && aluno) {
+    nomeArquivo = `Correcao_${aluno}_${turma}`.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 50);
+  } else {
+    nomeArquivo = `Correcao_${tema}`.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 50);
+  }
+
+  doc.save(`${nomeArquivo}.pdf`);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
