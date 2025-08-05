@@ -161,7 +161,7 @@ ${redacao}`;
           { role: "system", content: "Você é um corretor de redações especializado no ENEM." },
           { role: "user", content: prompt }
         ],
-        temperature: 0.5
+        temperature: 0.2
       })
     });
 
