@@ -1,8 +1,7 @@
 class CorretorRedacao {
   constructor() {
     this.redacoes = {
-      notas1000: "",
-      variadas: ""
+      exemplos: []
     };
     this.init();
   }
@@ -79,8 +78,11 @@ class CorretorRedacao {
   }
 
   criarPrompt(tema, redacao) {
+    const exemplos = this.redacoes.exemplos.map(ex => `Tema: ${ex.tema}\nNota: ${ex.nota}\nTexto: ${ex.texto}`).join('\n\n');
+
     return `Você é um assistente especializado em correção de redações do ENEM. Sua tarefa é avaliar a redação do usuário com base nas 5 competências oficiais do exame, fornecendo um feedback detalhado e atribuindo uma nota de 0 a 1000.
 Se a redação tiver menos de 7 linhas, a nota será 0 em todas as competências. E se não tiver nada a ver com o tema, a nota também será 0, mesmo se a gramática estiver correta.
+
 Competência I: Domínio da Norma Culta da Língua Portuguesa
 - Avalie a gramática, a estrutura sintática e a adequação ao registro formal.
 - Critérios de Pontuação:  
@@ -131,11 +133,8 @@ Competência V: Proposta de Intervenção
   - 160: Proposta bem elaborada e coerente.  
   - 200: Proposta detalhada, bem desenvolvida e articulada com o texto.
 
-Redações Nota 1000:
-${this.redacoes.notas1000}
-
-Redações Variadas:
-${this.redacoes.variadas}
+Exemplos de Redações Nota 1000:
+${exemplos}
 
 Tema: ${tema}
 
@@ -160,7 +159,6 @@ ${redacao}`;
     });
 
     if (!resposta.ok) throw new Error("Erro na API");
-
     const dados = await resposta.json();
     return dados.choices?.[0]?.message?.content;
   }
@@ -186,37 +184,42 @@ ${redacao}`;
     }
 
     const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
+    const doc = new jsPDF({ unit: "mm", format: "a4" });
     const hoje = new Date().toLocaleDateString("pt-BR");
 
+    doc.setFont("Helvetica");
     doc.setFontSize(14);
-    doc.text("Avaliação da Redação - ENEM", 10, 10);
-    doc.setFontSize(10);
+    doc.text("Avaliação da Redação - ENEM", 10, 15);
 
+    doc.setFontSize(10);
     let infoLine = `Data: ${hoje} | Tema: ${tema}`;
     if (turma && aluno) {
       infoLine = `Aluno: ${aluno} | Turma: ${turma} | ${infoLine}`;
     }
-    doc.text(infoLine, 10, 18);
+    doc.text(infoLine, 10, 23);
 
     doc.setFontSize(12);
     const linhas = doc.splitTextToSize(resultado, 180);
-    doc.text(linhas, 10, 30);
+    let y = 30;
+    linhas.forEach(linha => {
+      if (y > 280) {
+        doc.addPage();
+        y = 20;
+      }
+      doc.text(linha, 10, y);
+      y += 7;
+    });
 
-    let nomeArquivo;
+    let nomeArquivo = "Correcao";
     if (turma && aluno) {
-      nomeArquivo = `Correcao_${aluno}_${turma}`.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 50);
+      nomeArquivo = `Correcao_${aluno}_${turma}`.replace(/[^a-zA-Z0-9]/g, "_").substring(0, 50);
     } else {
-      nomeArquivo = `Correcao_${tema}`.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 50);
+      nomeArquivo = `Correcao_${tema}`.replace(/[^a-zA-Z0-9]/g, "_").substring(0, 50);
     }
+
     doc.save(`${nomeArquivo}.pdf`);
   }
 }
-
-document.addEventListener('DOMContentLoaded', () => {
-  window.corretor = new CorretorRedacao();
-});
-
 
 document.addEventListener('DOMContentLoaded', () => {
   window.corretor = new CorretorRedacao();
