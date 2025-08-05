@@ -221,6 +221,12 @@ ${redacao}`;
   }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  window.corretor = new CorretorRedacao();
+// Inicialização corrigida
+document.addEventListener('DOMContentLoaded', function() {
+  const corretor = new CorretorRedacao();
+  window.corretor = corretor; // Disponibiliza globalmente se necessário
+
+  // Atribui os eventos diretamente
+  document.getElementById('btnCorrigir')?.addEventListener('click', () => corretor.corrigirRedacao());
+  document.getElementById('btnBaixar')?.addEventListener('click', () => corretor.baixarPDF());
 });
