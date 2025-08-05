@@ -17,38 +17,32 @@ class CorretorRedacao {
   }
 
   async carregarRedacoes() {
-    const [r1, r2] = await Promise.all([
-      fetch("redacoes_notas_1000.txt"),
-      fetch("redacoes_variadas.txt")
-    ]);
-    
-    if (!r1.ok || !r2.ok) throw new Error("Falha ao carregar redações");
-    
-    this.redacoes.notas1000 = await r1.text();
-    this.redacoes.variadas = await r2.text();
+    const response = await fetch("redacoes.json");
+    if (!response.ok) throw new Error("Erro ao carregar redacoes.json");
+    const dados = await response.json();
+    this.redacoes = dados;
   }
 
   formatarResposta(resposta) {
     let textoFormatado = resposta
-      .replace(/\*\*/g, '')  // Remove negrito
-      .replace(/\*/g, '')    // Remove itálico
-      .replace(/__/g, '')    // Remove sublinhado
-      .replace(/~~/g, '')    // Remove riscado
-      .replace(/```/g, '')   // Remove blocos de código
-      .replace(/`/g, '')     // Remove código inline
-      .replace(/---+/g, '')  // Remove linhas divisórias
-      .replace(/\[(.*?)\]\(.*?\)/g, '$1')  // Remove links markdown
-      .replace(/<\/?[^>]+(>|$)/g, '');     // Remove tags HTML
+      .replace(/\*\*/g, '')
+      .replace(/\*/g, '')
+      .replace(/__/g, '')
+      .replace(/~~/g, '')
+      .replace(/```/g, '')
+      .replace(/`/g, '')
+      .replace(/---+/g, '')
+      .replace(/\[(.*?)\]\(.*?\)/g, '$1')
+      .replace(/<\/?[^>]+(>|$)/g, '');
 
     textoFormatado = textoFormatado
       .replace(/(Nota Final: \d+\/1000)/, '===== $1 =====\n\n')
       .replace(/(Detalhamento por Competência:)/, '\n$1\n\n')
       .replace(/(Competência [IVXLCDM]+ \(.*?\): \d+\/200)/g, '\n$1\n')
       .replace(/(Pontos Fortes:|Ajustes:)/g, '\n$1\n')
-      .replace(/(Recomendações para Melhoria:|Observação Final:)/g, '\n\n$1\n\n');
-
-    textoFormatado = textoFormatado.replace(/(\d+\.)\s/g, '\n$1 ');
-    textoFormatado = textoFormatado.replace(/\n{3,}/g, '\n\n');
+      .replace(/(Recomendações para Melhoria:|Observação Final:)/g, '\n\n$1\n\n')
+      .replace(/(\d+\.)\s/g, '\n$1 ')
+      .replace(/\n{3,}/g, '\n\n');
 
     return textoFormatado.trim();
   }
@@ -73,7 +67,7 @@ class CorretorRedacao {
       const prompt = this.criarPrompt(tema, redacao);
       const respostaBruta = await this.enviarParaAPI(prompt);
       const respostaFormatada = this.formatarResposta(respostaBruta);
-      
+
       resultadoDiv.innerText = respostaFormatada || "Não houve resposta da IA.";
       resultadoContainer.style.display = "block";
     } catch (erro) {
@@ -218,6 +212,10 @@ ${redacao}`;
     doc.save(`${nomeArquivo}.pdf`);
   }
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+  window.corretor = new CorretorRedacao();
+});
 
 document.addEventListener('DOMContentLoaded', () => {
   window.corretor = new CorretorRedacao();
