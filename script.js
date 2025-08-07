@@ -228,7 +228,8 @@ ${redacao}`;
 
     doc.save(`${nomeArquivo}.pdf`);
   }
-}
+} // <== VERIFIQUE SE ESTA LINHA ESTÁ NO FINAL MESMO!!
+
 document.addEventListener('DOMContentLoaded', function () {
   const corretor = new CorretorRedacao();
   window.corretor = corretor;
@@ -240,6 +241,10 @@ document.addEventListener('DOMContentLoaded', function () {
     btnCorrigir.addEventListener('click', () => corretor.corrigirRedacao());
   }
 
+  if (btnBaixar) {
+    btnBaixar.addEventListener('click', () => corretor.baixarPDF());
+  }
+});
   if (btnBaixar) {
     btnBaixar.addEventListener('click', () => corretor.baixarPDF());
   }
