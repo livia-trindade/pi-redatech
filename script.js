@@ -171,20 +171,22 @@ ${redacao}`;
   }
 
   
-baixarPDF() {
+function baixarPDF() {
   const resultadoElement = document.getElementById("resultado");
   if (!resultadoElement) {
     alert("Elemento de resultado não encontrado.");
     return;
   }
-  
+
   const resultado = resultadoElement.innerText.trim();
   const turmaInput = document.getElementById("turma");
   const alunoInput = document.getElementById("aluno");
+  const temaInput = document.getElementById("tema");
 
-  const turma = turmaInput ? turmaInput.value.trim() : null;
-  const aluno = alunoInput ? alunoInput.value.trim() : null;
-  const tema = document.getElementById("tema") ? document.getElementById("tema").value.trim() : null;
+  const turma = turmaInput ? turmaInput.value.trim() : "";
+  const aluno = alunoInput ? alunoInput.value.trim() : "";
+  const tema = temaInput ? temaInput.value.trim() : "";
+  const hoje = new Date().toLocaleDateString("pt-BR");
 
   if (!resultado || resultado.toLowerCase().includes("aguarde")) {
     alert("Nenhum resultado disponível para exportar.");
@@ -193,24 +195,26 @@ baixarPDF() {
 
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
-  const hoje = new Date().toLocaleDateString("pt-BR");
 
+  // Cabeçalho
   doc.setFont("Helvetica", "bold");
   doc.setFontSize(14);
   doc.text("Avaliação da Redação - ENEM", 10, 10);
 
+  // Subcabeçalho com informações
   doc.setFont("Helvetica", "normal");
   doc.setFontSize(10);
-
   let infoLine = `Data: ${hoje} | Tema: ${tema}`;
   if (turma) infoLine = `Turma: ${turma} | ` + infoLine;
   if (aluno) infoLine = `Aluno: ${aluno} | ` + infoLine;
   doc.text(infoLine, 10, 18);
 
+  // Tema novamente destacado
   doc.setFontSize(12);
   doc.setFont("Helvetica", "bold");
   doc.text(`Tema: ${tema}`, 10, 26);
 
+  // Corpo do texto
   doc.setFont("Helvetica", "normal");
   const linhas = doc.splitTextToSize(resultado, 180);
   let y = 35;
@@ -226,12 +230,17 @@ baixarPDF() {
     y += lineHeight;
   }
 
-  let nomeArquivo;
-  if (turma && aluno) {
-    nomeArquivo = `Correcao_${aluno}_${turma}`.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 50);
-  } else {
-    nomeArquivo = `Correcao_${tema}`.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 50);
-  }
+  // Função para limpar caracteres inválidos
+  const limpar = texto => texto.replace(/[^\w\s-]/gi, '').replace(/\s+/g, '_').trim();
 
-  doc.save(`${nomeArquivo}.pdf`);
+  // Nome do arquivo com aluno e turma
+  let nomeArquivo = "Correcao";
+  if (aluno && turma) {
+    nomeArquivo = `Correcao_${limpar(aluno)}_${limpar(turma)}`;
+  } else if (tema) {
+    nomeArquivo = `Correcao_${limpar(tema)}`;
+  }
+  nomeArquivo = nomeArquivo.substring(0, 50) + ".pdf";
+
+  doc.save(nomeArquivo);
 }
