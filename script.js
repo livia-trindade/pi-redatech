@@ -201,7 +201,6 @@ ${redacao}`;
     if (aluno) infoLine = `Aluno: ${aluno} | ` + infoLine;
     doc.text(infoLine, 10, 18);
 
-    // Título do tema
     doc.setFontSize(12);
     doc.setFont("Helvetica", "bold");
     doc.text(`Tema: ${tema}`, 10, 26);
@@ -231,9 +230,7 @@ ${redacao}`;
 
     doc.save(`${nomeArquivo}.pdf`);
   }
-} // ← IMPORTANTE: FECHAR A CLASSE AQUI
-
-// Script de ativação
+} 
 document.addEventListener('DOMContentLoaded', function () {
   const corretor = new CorretorRedacao();
   window.corretor = corretor;
