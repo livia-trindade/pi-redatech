@@ -201,7 +201,7 @@ function baixarPDF() {
   doc.setFontSize(14);
   doc.text("Avaliação da Redação - ENEM", 10, 10);
 
-  // Subcabeçalho com informações
+  // Subcabeçalho
   doc.setFont("Helvetica", "normal");
   doc.setFontSize(10);
   let infoLine = `Data: ${hoje} | Tema: ${tema}`;
@@ -209,12 +209,12 @@ function baixarPDF() {
   if (aluno) infoLine = `Aluno: ${aluno} | ` + infoLine;
   doc.text(infoLine, 10, 18);
 
-  // Tema novamente destacado
+  // Tema
   doc.setFontSize(12);
   doc.setFont("Helvetica", "bold");
   doc.text(`Tema: ${tema}`, 10, 26);
 
-  // Corpo do texto
+  // Texto da correção
   doc.setFont("Helvetica", "normal");
   const linhas = doc.splitTextToSize(resultado, 180);
   let y = 35;
@@ -230,10 +230,9 @@ function baixarPDF() {
     y += lineHeight;
   }
 
-  // Função para limpar caracteres inválidos
+  // Função para limpar nome de arquivo
   const limpar = texto => texto.replace(/[^\w\s-]/gi, '').replace(/\s+/g, '_').trim();
 
-  // Nome do arquivo com aluno e turma
   let nomeArquivo = "Correcao";
   if (aluno && turma) {
     nomeArquivo = `Correcao_${limpar(aluno)}_${limpar(turma)}`;
