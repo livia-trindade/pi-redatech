@@ -170,10 +170,11 @@ ${redacao}`;
     }
   }
 
-  baixarPDF() {
+ baixarPDF() {
     const resultado = document.getElementById("resultado").innerText.trim();
     const turmaInput = document.getElementById("turma");
     const alunoInput = document.getElementById("aluno");
+    
     const turma = turmaInput ? turmaInput.value.trim() : null;
     const aluno = alunoInput ? alunoInput.value.trim() : null;
     const tema = document.getElementById("tema").value.trim();
@@ -184,49 +185,37 @@ ${redacao}`;
     }
 
     const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({ unit: "mm", format: "a4" });
+    const doc = new jsPDF();
     const hoje = new Date().toLocaleDateString("pt-BR");
 
-    doc.setFont("Helvetica");
     doc.setFontSize(14);
-    doc.text("Avaliação da Redação - ENEM", 10, 15);
-
+    doc.text("Avaliação da Redação - ENEM", 10, 10);
     doc.setFontSize(10);
+    
     let infoLine = `Data: ${hoje} | Tema: ${tema}`;
     if (turma && aluno) {
       infoLine = `Aluno: ${aluno} | Turma: ${turma} | ${infoLine}`;
     }
-    doc.text(infoLine, 10, 23);
-
+    doc.text(infoLine, 10, 18);
+    
     doc.setFontSize(12);
     const linhas = doc.splitTextToSize(resultado, 180);
-    let y = 30;
-    linhas.forEach(linha => {
-      if (y > 280) {
-        doc.addPage();
-        y = 20;
-      }
-      doc.text(linha, 10, y);
-      y += 7;
-    });
-
-    let nomeArquivo = "Correcao";
+    doc.text(linhas, 10, 30);
+    
+    let nomeArquivo;
     if (turma && aluno) {
-      nomeArquivo = `Correcao_${aluno}_${turma}`.replace(/[^a-zA-Z0-9]/g, "_").substring(0, 50);
+      nomeArquivo = `Correcao_${aluno}_${turma}`.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 50);
     } else {
-      nomeArquivo = `Correcao_${tema}`.replace(/[^a-zA-Z0-9]/g, "_").substring(0, 50);
+      nomeArquivo = `Correcao_${tema}`.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 50);
     }
-
     doc.save(`${nomeArquivo}.pdf`);
   }
-}
 
-// Inicialização corrigida
+
 document.addEventListener('DOMContentLoaded', function() {
   const corretor = new CorretorRedacao();
-  window.corretor = corretor; // Disponibiliza globalmente se necessário
+  window.corretor = corretor; 
 
-  // Atribui os eventos diretamente
   document.getElementById('btnCorrigir')?.addEventListener('click', () => corretor.corrigirRedacao());
   document.getElementById('btnBaixar')?.addEventListener('click', () => corretor.baixarPDF());
 });
