@@ -230,7 +230,7 @@ ${redacao}`;
 
     doc.save(`${nomeArquivo}.pdf`);
   }
-} 
+} }
 document.addEventListener('DOMContentLoaded', function () {
   const corretor = new CorretorRedacao();
   window.corretor = corretor;
