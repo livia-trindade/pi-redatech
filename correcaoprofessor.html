@@ -430,21 +430,8 @@
     });
   </script>
   <script src="script.js"></script>
-   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const btnBaixar = document.getElementById("btnBaixar");
-      if (btnBaixar) {
-        btnBaixar.addEventListener("click", () => {
-          if (typeof baixarPDF === 'function') {
-            baixarPDF();
-          } else {
-            alert("Função baixarPDF não encontrada.");
-          }
-        });
-      }
-    });
-  </script>
 </body>
 </html>
+
 
 
