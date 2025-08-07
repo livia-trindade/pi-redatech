@@ -170,57 +170,82 @@ ${redacao}`;
     }
   }
 
-baixarPDF() {
-  const resultado = document.getElementById("resultado").innerText.trim();
-  const turmaInput = document.getElementById("turma");
-  const alunoInput = document.getElementById("aluno");
+  baixarPDF() {
+    const resultado = document.getElementById("resultado").innerText.trim();
+    const turmaInput = document.getElementById("turma");
+    const alunoInput = document.getElementById("aluno");
 
-  const turma = turmaInput ? turmaInput.value.trim() : null;
-  const aluno = alunoInput ? alunoInput.value.trim() : null;
-  const tema = document.getElementById("tema").value.trim();
+    const turma = turmaInput ? turmaInput.value.trim() : null;
+    const aluno = alunoInput ? alunoInput.value.trim() : null;
+    const tema = document.getElementById("tema").value.trim();
 
-  if (!resultado || resultado.includes("aguarde") || resultado.includes("Aguardando")) {
-    alert("Nenhum resultado disponível para exportar.");
-    return;
-  }
-
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
-  const hoje = new Date().toLocaleDateString("pt-BR");
-
-  doc.setFontSize(14);
-  doc.text("Avaliação da Redação - ENEM", 10, 10);
-  doc.setFontSize(10);
-
-  // Correção 1: mostrar informações disponíveis
-  let infoLine = `Data: ${hoje} | Tema: ${tema}`;
-  if (turma) infoLine = `Turma: ${turma} | ` + infoLine;
-  if (aluno) infoLine = `Aluno: ${aluno} | ` + infoLine;
-
-  doc.text(infoLine, 10, 18);
-  doc.setFontSize(12);
-
-  // Correção 2: quebra automática de página
-  const linhas = doc.splitTextToSize(resultado, 180);
-  let y = 30;
-  const lineHeight = 7;
-  const pageHeight = doc.internal.pageSize.height;
-
-  for (let i = 0; i < linhas.length; i++) {
-    if (y > pageHeight - 10) {
-      doc.addPage();
-      y = 10;
+    if (!resultado || resultado.toLowerCase().includes("aguarde")) {
+      alert("Nenhum resultado disponível para exportar.");
+      return;
     }
-    doc.text(linhas[i], 10, y);
-    y += lineHeight;
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    const hoje = new Date().toLocaleDateString("pt-BR");
+
+    // Cabeçalho
+    doc.setFont("Helvetica", "bold");
+    doc.setFontSize(14);
+    doc.text("Avaliação da Redação - ENEM", 10, 10);
+
+    doc.setFont("Helvetica", "normal");
+    doc.setFontSize(10);
+
+    let infoLine = `Data: ${hoje} | Tema: ${tema}`;
+    if (turma) infoLine = `Turma: ${turma} | ` + infoLine;
+    if (aluno) infoLine = `Aluno: ${aluno} | ` + infoLine;
+    doc.text(infoLine, 10, 18);
+
+    // Título do tema
+    doc.setFontSize(12);
+    doc.setFont("Helvetica", "bold");
+    doc.text(`Tema: ${tema}`, 10, 26);
+
+    // Conteúdo
+    doc.setFont("Helvetica", "normal");
+    const linhas = doc.splitTextToSize(resultado, 180);
+    let y = 35;
+    const lineHeight = 7;
+    const pageHeight = doc.internal.pageSize.height;
+
+    for (let i = 0; i < linhas.length; i++) {
+      if (y > pageHeight - 10) {
+        doc.addPage();
+        y = 10;
+      }
+      doc.text(linhas[i], 10, y);
+      y += lineHeight;
+    }
+
+    let nomeArquivo;
+    if (turma && aluno) {
+      nomeArquivo = `Correcao_${aluno}_${turma}`.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 50);
+    } else {
+      nomeArquivo = `Correcao_${tema}`.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 50);
+    }
+
+    doc.save(`${nomeArquivo}.pdf`);
+  }
+} // ← IMPORTANTE: FECHAR A CLASSE AQUI
+
+// Script de ativação
+document.addEventListener('DOMContentLoaded', function () {
+  const corretor = new CorretorRedacao();
+  window.corretor = corretor;
+
+  const btnCorrigir = document.getElementById('btnCorrigir');
+  const btnBaixar = document.getElementById('btnBaixar');
+
+  if (btnCorrigir) {
+    btnCorrigir.addEventListener('click', () => corretor.corrigirRedacao());
   }
 
-  let nomeArquivo;
-  if (turma && aluno) {
-    nomeArquivo = `Correcao_${aluno}_${turma}`.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 50);
-  } else {
-    nomeArquivo = `Correcao_${tema}`.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 50);
+  if (btnBaixar) {
+    btnBaixar.addEventListener('click', () => corretor.baixarPDF());
   }
-
-  doc.save(`${nomeArquivo}.pdf`);
-}
+});
