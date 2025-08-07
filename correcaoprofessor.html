@@ -375,7 +375,7 @@
 <div class="form-group">
   <div class="form-field">
     <label for="nome">Nome do Aluno:</label>
-    <input type="text" id="nome" required aria-required="true" placeholder="Digite o nome do aluno">
+    <input type="text" id="aluno" required aria-required="true" placeholder="Digite o nome do aluno">
   </div>
 
   <div class="form-field">
@@ -430,6 +430,21 @@
     });
   </script>
   <script src="script.js"></script>
+   <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const btnBaixar = document.getElementById("btnBaixar");
+      if (btnBaixar) {
+        btnBaixar.addEventListener("click", () => {
+          if (typeof baixarPDF === 'function') {
+            baixarPDF();
+          } else {
+            alert("Função baixarPDF não encontrada.");
+          }
+        });
+      }
+    });
+  </script>
 </body>
 </html>
+
 
