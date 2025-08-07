@@ -170,78 +170,68 @@ ${redacao}`;
     }
   }
 
-  baixarPDF() {
-    const resultado = document.getElementById("resultado").innerText.trim();
-    const turmaInput = document.getElementById("turma");
-    const alunoInput = document.getElementById("aluno");
-
-    const turma = turmaInput ? turmaInput.value.trim() : null;
-    const aluno = alunoInput ? alunoInput.value.trim() : null;
-    const tema = document.getElementById("tema").value.trim();
-
-    if (!resultado || resultado.toLowerCase().includes("aguarde")) {
-      alert("Nenhum resultado disponível para exportar.");
-      return;
-    }
-
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-    const hoje = new Date().toLocaleDateString("pt-BR");
-
-    doc.setFont("Helvetica", "bold");
-    doc.setFontSize(14);
-    doc.text("Avaliação da Redação - ENEM", 10, 10);
-
-    doc.setFont("Helvetica", "normal");
-    doc.setFontSize(10);
-
-    let infoLine = `Data: ${hoje} | Tema: ${tema}`;
-    if (turma) infoLine = `Turma: ${turma} | ` + infoLine;
-    if (aluno) infoLine = `Aluno: ${aluno} | ` + infoLine;
-    doc.text(infoLine, 10, 18);
-
-    doc.setFontSize(12);
-    doc.setFont("Helvetica", "bold");
-    doc.text(`Tema: ${tema}`, 10, 26);
-
-    doc.setFont("Helvetica", "normal");
-    const linhas = doc.splitTextToSize(resultado, 180);
-    let y = 35;
-    const lineHeight = 7;
-    const pageHeight = doc.internal.pageSize.height;
-
-    for (let i = 0; i < linhas.length; i++) {
-      if (y > pageHeight - 10) {
-        doc.addPage();
-        y = 10;
-      }
-      doc.text(linhas[i], 10, y);
-      y += lineHeight;
-    }
-
-    let nomeArquivo;
-    if (turma && aluno) {
-      nomeArquivo = `Correcao_${aluno}_${turma}`.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 50);
-    } else {
-      nomeArquivo = `Correcao_${tema}`.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 50);
-    }
-
-    doc.save(`${nomeArquivo}.pdf`);
+  
+baixarPDF() {
+  const resultadoElement = document.getElementById("resultado");
+  if (!resultadoElement) {
+    alert("Elemento de resultado não encontrado.");
+    return;
   }
-} // <== VERIFIQUE SE ESTA LINHA ESTÁ NO FINAL MESMO!!
+  
+  const resultado = resultadoElement.innerText.trim();
+  const turmaInput = document.getElementById("turma");
+  const alunoInput = document.getElementById("aluno");
 
-document.addEventListener('DOMContentLoaded', function () {
-  const corretor = new CorretorRedacao();
-  window.corretor = corretor;
+  const turma = turmaInput ? turmaInput.value.trim() : null;
+  const aluno = alunoInput ? alunoInput.value.trim() : null;
+  const tema = document.getElementById("tema") ? document.getElementById("tema").value.trim() : null;
 
-  const btnCorrigir = document.getElementById('btnCorrigir');
-  const btnBaixar = document.getElementById('btnBaixar');
-
-  if (btnCorrigir) {
-    btnCorrigir.addEventListener('click', () => corretor.corrigirRedacao());
+  if (!resultado || resultado.toLowerCase().includes("aguarde")) {
+    alert("Nenhum resultado disponível para exportar.");
+    return;
   }
 
-  if (btnBaixar) {
-    btnBaixar.addEventListener('click', () => corretor.baixarPDF());
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  const hoje = new Date().toLocaleDateString("pt-BR");
+
+  doc.setFont("Helvetica", "bold");
+  doc.setFontSize(14);
+  doc.text("Avaliação da Redação - ENEM", 10, 10);
+
+  doc.setFont("Helvetica", "normal");
+  doc.setFontSize(10);
+
+  let infoLine = `Data: ${hoje} | Tema: ${tema}`;
+  if (turma) infoLine = `Turma: ${turma} | ` + infoLine;
+  if (aluno) infoLine = `Aluno: ${aluno} | ` + infoLine;
+  doc.text(infoLine, 10, 18);
+
+  doc.setFontSize(12);
+  doc.setFont("Helvetica", "bold");
+  doc.text(`Tema: ${tema}`, 10, 26);
+
+  doc.setFont("Helvetica", "normal");
+  const linhas = doc.splitTextToSize(resultado, 180);
+  let y = 35;
+  const lineHeight = 7;
+  const pageHeight = doc.internal.pageSize.height;
+
+  for (let i = 0; i < linhas.length; i++) {
+    if (y > pageHeight - 10) {
+      doc.addPage();
+      y = 10;
+    }
+    doc.text(linhas[i], 10, y);
+    y += lineHeight;
   }
-});
+
+  let nomeArquivo;
+  if (turma && aluno) {
+    nomeArquivo = `Correcao_${aluno}_${turma}`.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 50);
+  } else {
+    nomeArquivo = `Correcao_${tema}`.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 50);
+  }
+
+  doc.save(`${nomeArquivo}.pdf`);
+}
