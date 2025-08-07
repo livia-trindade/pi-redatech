@@ -214,8 +214,15 @@ ${redacao}`;
 
 document.addEventListener('DOMContentLoaded', function() {
   const corretor = new CorretorRedacao();
-  window.corretor = corretor; 
-
-  document.getElementById('btnCorrigir')?.addEventListener('click', () => corretor.corrigirRedacao());
-  document.getElementById('btnBaixar')?.addEventListener('click', () => corretor.baixarPDF());
+  window.corretor = corretor;
+  const btnCorrigir = document.getElementById('btnCorrigir');
+  const btnBaixar = document.getElementById('btnBaixar');
+  
+  if (btnCorrigir) {
+    btnCorrigir.addEventListener('click', () => corretor.corrigirRedacao());
+  }
+  
+  if (btnBaixar) {
+    btnBaixar.addEventListener('click', () => corretor.baixarPDF());
+  }
 });
