@@ -170,7 +170,6 @@ ${redacao}`;
     }
   }
 
-  
   baixarPDF() {
     const resultado = document.getElementById("resultado").innerText.trim();
     const turmaInput = document.getElementById("turma");
