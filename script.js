@@ -188,7 +188,6 @@ ${redacao}`;
     const doc = new jsPDF();
     const hoje = new Date().toLocaleDateString("pt-BR");
 
-    // Cabeçalho
     doc.setFont("Helvetica", "bold");
     doc.setFontSize(14);
     doc.text("Avaliação da Redação - ENEM", 10, 10);
@@ -205,7 +204,6 @@ ${redacao}`;
     doc.setFont("Helvetica", "bold");
     doc.text(`Tema: ${tema}`, 10, 26);
 
-    // Conteúdo
     doc.setFont("Helvetica", "normal");
     const linhas = doc.splitTextToSize(resultado, 180);
     let y = 35;
@@ -230,7 +228,7 @@ ${redacao}`;
 
     doc.save(`${nomeArquivo}.pdf`);
   }
-} }
+}
 document.addEventListener('DOMContentLoaded', function () {
   const corretor = new CorretorRedacao();
   window.corretor = corretor;
