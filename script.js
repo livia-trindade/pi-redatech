@@ -245,7 +245,3 @@ document.addEventListener('DOMContentLoaded', function () {
     btnBaixar.addEventListener('click', () => corretor.baixarPDF());
   }
 });
-  if (btnBaixar) {
-    btnBaixar.addEventListener('click', () => corretor.baixarPDF());
-  }
-});
